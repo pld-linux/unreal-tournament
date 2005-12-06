@@ -3,6 +3,7 @@
 # - use datadir
 # - use system libs
 Summary:	Futuristic FPS
+Summary(pl):	Futurystyczna gra FPS
 Name:		unreal-tournament
 Version:	451
 Release:	0.1
@@ -28,7 +29,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_gamedatadir	%{_datadir}/games/%{name}
 
 %description
-Unreal Tournament.
+Unreal Tournament - futuristic FPS game.
+
+%description -l pl
+Unreal Tournament - futurystyczna gra FPS.
 
 %prep
 %setup -qcT
