@@ -3,7 +3,7 @@
 # - use datadir
 # - use system libs
 Summary:	Futuristic FPS
-Summary(pl.UTF-8):   Futurystyczna gra FPS
+Summary(pl.UTF-8):	Futurystyczna gra FPS
 Name:		unreal-tournament
 Version:	451
 Release:	0.1
