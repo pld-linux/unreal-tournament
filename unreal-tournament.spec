@@ -20,8 +20,6 @@ Requires:	SDL
 ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		no_install_post_strip	1
-
 %define		_noautoreq		Core.so Editor.so Engine.so Render.so
 %define		__syslibs		libSDL-1.1.so.0 libmikmod.so.2 libopenal-0.0.so
 %define		_noautoprov		%{__syslibs} %{_noautoreq} ALAudio.so Audio.so Fire.so GlideDrv.so IpDrv.so NullNetDriver.so NullRender.so OpenGLDrv.so SDLDrv.so SDLGLDrv.so SDLSoftDrv.so UWeb.so
