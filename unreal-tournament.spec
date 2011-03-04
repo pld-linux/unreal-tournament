@@ -1,3 +1,6 @@
+#
+# Conditional build:
+%bcond_with	3dfx		# prefer Glide over OpenGL in config
 # TODO
 # - all
 # - use datadir
@@ -6,7 +9,7 @@ Summary:	Futuristic FPS
 Summary(pl.UTF-8):	Futurystyczna gra FPS
 Name:		unreal-tournament
 Version:	451
-Release:	0.1
+Release:	0.2
 License:	as-is
 Group:		Applications/Games
 Source0:	ftp://ftp.lokigames.com/pub/patches/ut/ut-install-436.run
@@ -20,8 +23,8 @@ Requires:	SDL
 ExclusiveArch:	%{ix86} %{x8664}
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_noautoreq		Core.so Editor.so Engine.so Render.so
-%define		__syslibs		libSDL-1.1.so.0 libmikmod.so.2 libopenal-0.0.so
+%define		_noautoreq		Core.so Editor.so Engine.so Render.so libopenal-0.0.so libglide.so.2
+%define		__syslibs		libSDL-1.1.so.0 libmikmod.so.2
 %define		_noautoprov		%{__syslibs} %{_noautoreq} ALAudio.so Audio.so Fire.so GlideDrv.so IpDrv.so NullNetDriver.so NullRender.so OpenGLDrv.so SDLDrv.so SDLGLDrv.so SDLSoftDrv.so UWeb.so
 %define		_enable_debug_packages	0
 %define		skip_post_check_so	libSDL-1.1.so.0
@@ -39,26 +42,31 @@ Unreal Tournament - futurystyczna gra FPS.
 %setup -qcT
 skip=$(grep -a ^skip= %{SOURCE0} | cut -d= -f2)
 tail -n +$skip %{SOURCE0} | tar -zx
-install -d UTPG
+install -d UTPG lib
 tar -C UTPG -xf %{SOURCE1}
 rm -f UTPG/{checkfiles.sh,patch.md5}
+
+tar -zxf Credits.tar.gz -C lib
+# NetGamesUSA.com
+tar -zxf NetGamesUSA.com.tar.gz -C lib
+
+# System
+%if %{with 3dfx}
+tar -zxf Glide.ini.tar.gz -C lib
+%else
+tar -zxf OpenGL.ini.tar.gz -C lib
+%endif
+tar -zxf data.tar.gz -C lib
+
+# not really needed to execute
+chmod a-x lib/NetGamesUSA.com/ngStats/spawnBrowser.exe
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{%{gamedatadir},%{gamelibdir}} \
 	$RPM_BUILD_ROOT{%{_pixmapsdir},%{_desktopdir},%{_bindir}}
 
-tar -zxf Credits.tar.gz -C $RPM_BUILD_ROOT%{gamelibdir}
-# NetGamesUSA.com
-tar -zxf NetGamesUSA.com.tar.gz -C $RPM_BUILD_ROOT%{gamelibdir}
-
-# System
-%if %{with 3dfx}
-	tar -zxf Glide.ini.tar.gz -C $RPM_BUILD_ROOT%{gamelibdir}
-%else
-	tar -zxf OpenGL.ini.tar.gz -C $RPM_BUILD_ROOT%{gamelibdir}
-%endif
-tar -zxf data.tar.gz -C $RPM_BUILD_ROOT%{gamelibdir}
+cp -a lib/* $RPM_BUILD_ROOT%{gamelibdir}
 
 # the most important things, ucc & ut :)
 install -p bin/x86/{ucc,ut} $RPM_BUILD_ROOT%{gamelibdir}
