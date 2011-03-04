@@ -23,8 +23,11 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_noautoreq		Core.so Editor.so Engine.so Render.so
 %define		__syslibs		libSDL-1.1.so.0 libmikmod.so.2 libopenal-0.0.so
 %define		_noautoprov		%{__syslibs} %{_noautoreq} ALAudio.so Audio.so Fire.so GlideDrv.so IpDrv.so NullNetDriver.so NullRender.so OpenGLDrv.so SDLDrv.so SDLGLDrv.so SDLSoftDrv.so UWeb.so
-%define		_gamelibdir		%{_libdir}/games/%{name}
-%define		_gamedatadir	%{_datadir}/games/%{name}
+%define		_enable_debug_packages	0
+%define		skip_post_check_so	libSDL-1.1.so.0
+
+%define		gamelibdir		%{_libdir}/games/%{name}
+%define		gamedatadir		%{_datadir}/games/%{name}
 
 %description
 Unreal Tournament - futuristic FPS game.
@@ -35,39 +38,39 @@ Unreal Tournament - futurystyczna gra FPS.
 %prep
 %setup -qcT
 skip=$(grep -a ^skip= %{SOURCE0} | cut -d= -f2)
-tail -n +${skip} %{SOURCE0} | tar -zx
-mkdir UTPG
+tail -n +$skip %{SOURCE0} | tar -zx
+install -d UTPG
 tar -C UTPG -xf %{SOURCE1}
 rm -f UTPG/{checkfiles.sh,patch.md5}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{%{_gamedatadir},%{_gamelibdir}} \
+install -d $RPM_BUILD_ROOT{%{gamedatadir},%{gamelibdir}} \
 	$RPM_BUILD_ROOT{%{_pixmapsdir},%{_desktopdir},%{_bindir}}
 
-tar -zxf Credits.tar.gz -C $RPM_BUILD_ROOT%{_gamelibdir}
+tar -zxf Credits.tar.gz -C $RPM_BUILD_ROOT%{gamelibdir}
 # NetGamesUSA.com
-tar -zxf NetGamesUSA.com.tar.gz -C $RPM_BUILD_ROOT%{_gamelibdir}
+tar -zxf NetGamesUSA.com.tar.gz -C $RPM_BUILD_ROOT%{gamelibdir}
 
 # System
 %if %{with 3dfx}
-	tar -zxf Glide.ini.tar.gz -C $RPM_BUILD_ROOT%{_gamelibdir}
+	tar -zxf Glide.ini.tar.gz -C $RPM_BUILD_ROOT%{gamelibdir}
 %else
-	tar -zxf OpenGL.ini.tar.gz -C $RPM_BUILD_ROOT%{_gamelibdir}
+	tar -zxf OpenGL.ini.tar.gz -C $RPM_BUILD_ROOT%{gamelibdir}
 %endif
-tar -zxf data.tar.gz -C $RPM_BUILD_ROOT%{_gamelibdir}
+tar -zxf data.tar.gz -C $RPM_BUILD_ROOT%{gamelibdir}
 
 # the most important things, ucc & ut :)
-install bin/x86/{ucc,ut} $RPM_BUILD_ROOT%{_gamelibdir}
+install -p bin/x86/{ucc,ut} $RPM_BUILD_ROOT%{gamelibdir}
 
 # install a few random files
-install README icon.{bmp,xpm} $RPM_BUILD_ROOT%{_gamelibdir}
+cp -p README icon.{bmp,xpm} $RPM_BUILD_ROOT%{gamelibdir}
 
 # install a menu item (closes bug #27542)
-install icon.xpm $RPM_BUILD_ROOT%{_pixmapsdir}/ut.xpm
+cp -p icon.xpm $RPM_BUILD_ROOT%{_pixmapsdir}/ut.xpm
 
 # finally, unleash the UTPG patch
-cp -rf UTPG/* $RPM_BUILD_ROOT%{_gamelibdir}
+cp -a UTPG/* $RPM_BUILD_ROOT%{gamelibdir}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -76,18 +79,16 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %{_pixmapsdir}/ut.xpm
 
-%dir %{_gamelibdir}
-%{_gamelibdir}/Web
-%{_gamelibdir}/Textures
-%{_gamelibdir}/NetGamesUSA.com
-%{_gamelibdir}/Help
-%{_gamelibdir}/System
-%{_gamelibdir}/README
-%{_gamelibdir}/checkfiles.sh
-%{_gamelibdir}/icon.bmp
-%{_gamelibdir}/icon.xpm
-%{_gamelibdir}/patch.md5
-%{_gamelibdir}/ucc
-%{_gamelibdir}/ut
+%dir %{gamelibdir}
+%{gamelibdir}/Web
+%{gamelibdir}/Textures
+%{gamelibdir}/NetGamesUSA.com
+%{gamelibdir}/Help
+%{gamelibdir}/System
+%{gamelibdir}/README
+%{gamelibdir}/icon.bmp
+%{gamelibdir}/icon.xpm
+%{gamelibdir}/ucc
+%{gamelibdir}/ut
 
-%dir %{_gamedatadir}
+%dir %{gamedatadir}
